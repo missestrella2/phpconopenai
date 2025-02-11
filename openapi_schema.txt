@@ -1,0 +1,88 @@
+openapi: 3.1.0
+info:
+  title: API de Usuarios - Php frontend con OpenAPI
+  version: 1.0.0
+  description: API para gestionar usuarios. Permite operaciones CRUD (Crear, Leer, Actualizar, Eliminar).
+servers:
+  - url: "https://hotpink-dove-275924.hostingersite.com/api.php"
+    description: Servidor en producción
+
+paths:
+  /api/usuarios:
+    get:
+      summary: Listar usuarios
+      operationId: listarUsuarios
+      description: Obtiene la lista de usuarios registrados.
+      parameters:
+        - name: limit
+          in: query
+          description: Número máximo de usuarios a devolver.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: offset
+          in: query
+          description: Número de usuarios a omitir antes de comenzar la lista.
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Lista de usuarios obtenida con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Usuario"
+        "500":
+          description: Error interno del servidor.
+
+    post:
+      summary: Crear un usuario
+      operationId: crearUsuario
+      description: Crea un nuevo usuario en la base de datos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Usuario"
+      responses:
+        "201":
+          description: Usuario creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "400":
+          description: Datos inválidos en la solicitud.
+        "409":
+          description: Conflicto, el email ya está registrado.
+        "500":
+          description: Error interno del servidor.
+
+components:
+  schemas:
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        fecha_creacion:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - nombre
+        - email
